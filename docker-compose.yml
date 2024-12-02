@@ -1,0 +1,7 @@
+services:
+  node1:
+    build: .
+  node2:
+    build: .
+  node3:
+    build: .
