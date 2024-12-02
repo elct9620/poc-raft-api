@@ -12,7 +12,15 @@ import (
 )
 
 func main() {
-	store := store.NewStore()
+	store, err := store.NewStore(
+		os.Getenv("HOSTNAME"),
+		"/data",
+		os.Getenv("RAFT_ADDRESS"),
+	)
+	if err != nil {
+		log.Fatal(fmt.Errorf("failed to create store: %w", err))
+	}
+
 	server := server.NewServer(
 		store,
 	)
