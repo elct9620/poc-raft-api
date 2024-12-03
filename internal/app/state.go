@@ -15,24 +15,41 @@ func (n noopSnapshot) Persist(sink raft.SnapshotSink) error {
 
 func (n noopSnapshot) Release() {}
 
-type state struct {
+type State struct {
 	db *sync.Map
 }
 
-func newState() *state {
-	return &state{
+func NewState() *State {
+	return &State{
 		db: &sync.Map{},
 	}
 }
 
-func (f *state) Apply(log *raft.Log) any {
+func (f *State) Apply(log *raft.Log) any {
 	return nil
 }
 
-func (f *state) Restore(io.ReadCloser) error {
+func (f *State) Restore(io.ReadCloser) error {
 	return nil
 }
 
-func (f *state) Snapshot() (raft.FSMSnapshot, error) {
+func (f *State) Snapshot() (raft.FSMSnapshot, error) {
 	return noopSnapshot{}, nil
+}
+
+func (f *State) Get(key string) (any, bool) {
+	v, ok := f.db.Load(key)
+	if !ok {
+		return nil, false
+	}
+
+	return v, true
+}
+
+func (f *State) Set(key string, value any) {
+	f.db.Store(key, value)
+}
+
+func (f *State) Delete(key string) {
+	f.db.Delete(key)
 }

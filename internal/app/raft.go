@@ -14,7 +14,7 @@ const RaftSnapshotRetainCount = 2
 const RaftMaxPool = 10
 const RaftTimeout = 10 * time.Second
 
-func NewRaft(nodeId string, rootDir string, raftAddress string) (*raft.Raft, error) {
+func NewRaft(nodeId string, rootDir string, raftAddress string, state raft.FSM) (*raft.Raft, error) {
 	boltStore, err := raftboltdb.NewBoltStore(path.Join(rootDir, "boltdb"))
 	if err != nil {
 		return nil, err
@@ -37,7 +37,6 @@ func NewRaft(nodeId string, rootDir string, raftAddress string) (*raft.Raft, err
 
 	config := raft.DefaultConfig()
 	config.LocalID = raft.ServerID(nodeId)
-	state := newState()
 
 	r, err := raft.NewRaft(config, state, boltStore, boltStore, snapshots, transport)
 	if err != nil {

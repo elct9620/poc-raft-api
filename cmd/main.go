@@ -12,17 +12,18 @@ import (
 )
 
 func main() {
+	state := app.NewState()
 	r, err := app.NewRaft(
 		os.Getenv("HOSTNAME"),
 		"/data",
 		os.Getenv("RAFT_ADDRESS"),
+		state,
 	)
 	if err != nil {
 		log.Fatal(fmt.Errorf("failed to create raft: %w", err))
 	}
 
-	server := server.NewServer(r)
-
+	server := server.NewServer(r, state)
 	signalChan := make(chan os.Signal, 1)
 	signal.Notify(signalChan, os.Interrupt, syscall.SIGTERM)
 
