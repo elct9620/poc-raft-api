@@ -1,4 +1,4 @@
-package store
+package app
 
 import (
 	"net"
@@ -7,24 +7,20 @@ import (
 	"time"
 
 	"github.com/hashicorp/raft"
-	raftboltdb "github.com/hashicorp/raft-boltdb/v2"
+	raftboltdb "github.com/hashicorp/raft-boltdb"
 )
 
-const SnapshotRetainCount = 2
+const RaftSnapshotRetainCount = 2
 const RaftMaxPool = 10
 const RaftTimeout = 10 * time.Second
 
-type Store struct {
-	raft *raft.Raft
-}
-
-func NewStore(nodeId string, rootDir string, raftAddress string) (*Store, error) {
+func NewRaft(nodeId string, rootDir string, raftAddress string) (*raft.Raft, error) {
 	boltStore, err := raftboltdb.NewBoltStore(path.Join(rootDir, "boltdb"))
 	if err != nil {
 		return nil, err
 	}
 
-	snapshots, err := raft.NewFileSnapshotStore(path.Join(rootDir, "snapshots"), SnapshotRetainCount, os.Stderr)
+	snapshots, err := raft.NewFileSnapshotStore(path.Join(rootDir, "snapshots"), RaftSnapshotRetainCount, os.Stderr)
 	if err != nil {
 		return nil, err
 	}
@@ -41,10 +37,9 @@ func NewStore(nodeId string, rootDir string, raftAddress string) (*Store, error)
 
 	config := raft.DefaultConfig()
 	config.LocalID = raft.ServerID(nodeId)
+	state := newState()
 
-	fsm := newFsm()
-
-	r, err := raft.NewRaft(config, fsm, boltStore, boltStore, snapshots, transport)
+	r, err := raft.NewRaft(config, state, boltStore, boltStore, snapshots, transport)
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +53,5 @@ func NewStore(nodeId string, rootDir string, raftAddress string) (*Store, error)
 		},
 	})
 
-	return &Store{
-		raft: r,
-	}, nil
+	return r, nil
 }

@@ -3,22 +3,22 @@ package server
 import (
 	"net/http"
 
-	"github.com/elct9620/poc-raft-api/internal/store"
+	"github.com/hashicorp/raft"
 )
 
 type Server struct {
 	httpServer *http.Server
-	store      *store.Store
+	raft       *raft.Raft
 }
 
 func NewServer(
-	store *store.Store,
+	raft *raft.Raft,
 ) *Server {
 	return &Server{
 		httpServer: &http.Server{
 			Addr: ":8080",
 		},
-		store: store,
+		raft: raft,
 	}
 }
 

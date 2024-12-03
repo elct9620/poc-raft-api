@@ -1,4 +1,4 @@
-package store
+package app
 
 import (
 	"io"
@@ -15,24 +15,24 @@ func (n noopSnapshot) Persist(sink raft.SnapshotSink) error {
 
 func (n noopSnapshot) Release() {}
 
-type fsm struct {
+type state struct {
 	db *sync.Map
 }
 
-func newFsm() *fsm {
-	return &fsm{
+func newState() *state {
+	return &state{
 		db: &sync.Map{},
 	}
 }
 
-func (f *fsm) Apply(log *raft.Log) any {
+func (f *state) Apply(log *raft.Log) any {
 	return nil
 }
 
-func (f *fsm) Restore(io.ReadCloser) error {
+func (f *state) Restore(io.ReadCloser) error {
 	return nil
 }
 
-func (f *fsm) Snapshot() (raft.FSMSnapshot, error) {
+func (f *state) Snapshot() (raft.FSMSnapshot, error) {
 	return noopSnapshot{}, nil
 }
