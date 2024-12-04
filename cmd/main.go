@@ -8,15 +8,18 @@ import (
 	"syscall"
 
 	"github.com/elct9620/poc-raft-api/internal/app"
+	"github.com/elct9620/poc-raft-api/internal/config"
 	"github.com/elct9620/poc-raft-api/internal/server"
 )
 
 func main() {
+	cfg := config.New()
+
 	state := app.NewState()
 	r, err := app.NewRaft(
-		os.Getenv("HOSTNAME"),
-		"/data",
-		os.Getenv("RAFT_ADDRESS"),
+		cfg.Hostname(),
+		cfg.DataDir(),
+		cfg.RaftAddress(),
 		state,
 	)
 	if err != nil {
