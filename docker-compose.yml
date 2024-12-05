@@ -5,12 +5,14 @@ services:
   node1:
     <<: *app
     environment:
-      - RAFT_ADDRESS=node1:9292
+      - RAFT_ADDRESS=node1:2773
+    ports:
+      - "8080:8080"
   node2:
     <<: *app
     environment:
-      - RAFT_ADDRESS=node2:9292
+      - RAFT_ADDRESS=node2:2773
   node3:
     <<: *app
     environment:
-      - RAFT_ADDRESS=node3:9292
+      - RAFT_ADDRESS=node3:2773

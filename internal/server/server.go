@@ -22,16 +22,23 @@ func NewServer(
 	raft *raft.Raft,
 	store KvStore,
 ) *Server {
-	return &Server{
+	mux := http.NewServeMux()
+	srv := &Server{
 		httpServer: &http.Server{
-			Addr: ":8080",
+			Addr:    ":8080",
+			Handler: mux,
 		},
 		raft:  raft,
 		store: store,
 	}
+
+	mux.HandleFunc("POST /join", srv.PostJoin)
+
+	return srv
 }
 
 func (s *Server) Start() error {
+
 	return s.httpServer.ListenAndServe()
 }
 
