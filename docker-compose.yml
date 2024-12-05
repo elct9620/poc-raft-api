@@ -1,5 +1,6 @@
 x-app: &app
   build: .
+  restart: unless-stopped
 
 services:
   node1:
@@ -12,7 +13,9 @@ services:
     <<: *app
     environment:
       - RAFT_ADDRESS=node2:2773
+      - RAFT_LEADER_API=http://node1:8080
   node3:
     <<: *app
     environment:
       - RAFT_ADDRESS=node3:2773
+      - RAFT_LEADER_API=http://node1:8080

@@ -3,9 +3,10 @@ package config
 import "os"
 
 type Config struct {
-	hostname    string
-	dataDir     string
-	raftAddress string
+	hostname      string
+	dataDir       string
+	raftAddress   string
+	raftLeaderApi string
 }
 
 func New() *Config {
@@ -24,10 +25,13 @@ func New() *Config {
 		raftAddress = "localhost:2773"
 	}
 
+	raftLeaderApi := os.Getenv("RAFT_LEADER_API")
+
 	return &Config{
-		hostname:    hostname,
-		dataDir:     dataDir,
-		raftAddress: raftAddress,
+		hostname:      hostname,
+		dataDir:       dataDir,
+		raftAddress:   raftAddress,
+		raftLeaderApi: raftLeaderApi,
 	}
 }
 
@@ -41,4 +45,12 @@ func (c *Config) DataDir() string {
 
 func (c *Config) RaftAddress() string {
 	return c.raftAddress
+}
+
+func (c *Config) IsLeader() bool {
+	return c.raftLeaderApi == ""
+}
+
+func (c *Config) RaftLeaderApi() string {
+	return c.raftLeaderApi
 }

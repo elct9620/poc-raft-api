@@ -14,14 +14,8 @@ import (
 
 func main() {
 	cfg := config.New()
-
 	state := app.NewState()
-	r, err := app.NewRaft(
-		cfg.Hostname(),
-		cfg.DataDir(),
-		cfg.RaftAddress(),
-		state,
-	)
+	r, err := app.NewRaft(cfg, state)
 	if err != nil {
 		log.Fatal(fmt.Errorf("failed to create raft: %w", err))
 	}
