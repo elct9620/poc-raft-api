@@ -7,6 +7,7 @@ import (
 )
 
 type KvRepository interface {
+	Get(key string) string
 	Set(key string, value string) error
 }
 
@@ -31,6 +32,7 @@ func NewServer(
 	}
 
 	mux.HandleFunc("POST /join", srv.PostJoin)
+	mux.HandleFunc("GET /value/{key}", srv.GetValue)
 	mux.HandleFunc("PUT /value", srv.PutValue)
 
 	return srv

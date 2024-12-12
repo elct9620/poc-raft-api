@@ -20,6 +20,20 @@ func NewKeyValueRepository(raft *raft.Raft, state *app.State) *KeyValueRepositor
 	}
 }
 
+func (r *KeyValueRepository) Get(key string) string {
+	value, isFound := r.state.Get(key)
+	if !isFound {
+		return ""
+	}
+
+	strValue, ok := value.(string)
+	if !ok {
+		return ""
+	}
+
+	return strValue
+}
+
 func (r *KeyValueRepository) Set(key string, value string) error {
 	cmd := app.StateCommand{
 		Key:   key,
