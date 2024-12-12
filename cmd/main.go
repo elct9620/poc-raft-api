@@ -9,6 +9,7 @@ import (
 
 	"github.com/elct9620/poc-raft-api/internal/app"
 	"github.com/elct9620/poc-raft-api/internal/config"
+	"github.com/elct9620/poc-raft-api/internal/repository"
 	"github.com/elct9620/poc-raft-api/internal/server"
 )
 
@@ -20,7 +21,9 @@ func main() {
 		log.Fatal(fmt.Errorf("failed to create raft: %w", err))
 	}
 
-	server := server.NewServer(r, state)
+	kvRepository := repository.NewKeyValueRepository(r, state)
+
+	server := server.NewServer(r, kvRepository)
 	signalChan := make(chan os.Signal, 1)
 	signal.Notify(signalChan, os.Interrupt, syscall.SIGTERM)
 

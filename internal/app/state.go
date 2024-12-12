@@ -1,6 +1,8 @@
 package app
 
 import (
+	"encoding/json"
+	"fmt"
 	"io"
 	"sync"
 
@@ -15,6 +17,11 @@ func (n noopSnapshot) Persist(sink raft.SnapshotSink) error {
 
 func (n noopSnapshot) Release() {}
 
+type StateCommand struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
+}
+
 type State struct {
 	db *sync.Map
 }
@@ -26,6 +33,18 @@ func NewState() *State {
 }
 
 func (f *State) Apply(log *raft.Log) any {
+	switch log.Type {
+	case raft.LogCommand:
+		var cmd StateCommand
+		if err := json.Unmarshal(log.Data, &cmd); err != nil {
+			return err
+		}
+
+		f.Set(cmd.Key, cmd.Value)
+	default:
+		return fmt.Errorf("unhandled log type %v", log.Type)
+	}
+
 	return nil
 }
 

@@ -6,21 +6,19 @@ import (
 	"github.com/hashicorp/raft"
 )
 
-type KvStore interface {
-	Get(key string) (any, bool)
-	Set(key string, value any)
-	Delete(key string)
+type KvRepository interface {
+	Set(key string, value string) error
 }
 
 type Server struct {
 	httpServer *http.Server
 	raft       *raft.Raft
-	store      KvStore
+	kvStore    KvRepository
 }
 
 func NewServer(
 	raft *raft.Raft,
-	store KvStore,
+	kvStore KvRepository,
 ) *Server {
 	mux := http.NewServeMux()
 	srv := &Server{
@@ -28,17 +26,17 @@ func NewServer(
 			Addr:    ":8080",
 			Handler: mux,
 		},
-		raft:  raft,
-		store: store,
+		raft:    raft,
+		kvStore: kvStore,
 	}
 
 	mux.HandleFunc("POST /join", srv.PostJoin)
+	mux.HandleFunc("PUT /value", srv.PutValue)
 
 	return srv
 }
 
 func (s *Server) Start() error {
-
 	return s.httpServer.ListenAndServe()
 }
 
